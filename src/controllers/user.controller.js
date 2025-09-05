@@ -2,7 +2,8 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import {ApiError} from "../utils/ApiError.js"
 import { User } from "../models/user.models.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
-import { APiResponse } from "../utils/ApiResponse.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+//import {  } from "../middleware/multer.middleware.js";
 
  const registerUser = asyncHandler( async (req, res) =>{
   // get user details from frontend 
@@ -20,20 +21,20 @@ import { APiResponse } from "../utils/ApiResponse.js";
   console.log("email: ", email);
 
  if(
-     [fullname. email, username, password].some( (field) => 
+     [fullname, email, username, password].some( (field) => 
     field?.trim()==="")
  ) {
   throw new ApiError(400, "ALl fields are required")
  }
   
- const existedUser = User.findOne({
+ const existedUser = await User.findOne({
   $or: [{username}, {email}]
  })
 
  if (existedUser) {
   throw new ApiError(409, "User with email or username already exists");
  }
-
+// console.log(req.files);
 const avatarLocalPath = req.files?.avatar[0]?.path;
 
 const coverImageLocalPath = req.files?.coverImage[0]?.path;
@@ -67,7 +68,7 @@ if(!avatarLocalPath)
   }
 
   return res.status(201).json(
-    new APiResponse(200, createdUser, "User registered Successfully")
+    new ApiResponse(200, createdUser, "User registered Successfully")
   )
 
 
